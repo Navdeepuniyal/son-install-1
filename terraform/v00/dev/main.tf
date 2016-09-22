@@ -1,6 +1,6 @@
 #
 variable "node_count" {
-  default = 2
+  default = 1
 }
 
 resource "openstack_compute_floatingip_v2" "fip" {
@@ -27,4 +27,21 @@ resource "openstack_compute_instance_v2" "sonata-sp" {
   }
   floating_ip = "${element(openstack_compute_floatingip_v2.fip.*.address, count.index)}"
   user_data = "${file("bootstrap-son.sh")}"
+
+provisioner "file"{
+    source = "floatingip"
+    destination = "/home/ubuntu/floatingip"
+    connection {
+        user = "${var.ssh_user}"
+        private_key = "${file("/etc/ansible/son-ift-ptin.rsa")}"
+    }
+}
+
+provisioner "remote-exec" {
+    inline = ["sudo sh -c 'echo ${openstack_compute_instance_v2.sonata-sp.access_ip_v4} ${openstack_compute_instance_v2.sonata-sp.name} >> /etc/hosts'"]
+    connection {
+      user = "ubuntu"
+      private_key = "${file("/etc/ansible/son-ift-ptin.rsa")}"
+    }
+ }
 }
