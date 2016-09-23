@@ -33,7 +33,7 @@ provisioner "file"{
     destination = "/home/ubuntu/floatingip"
     connection {
         user = "${var.ssh_user}"
-        private_key = "${file("/etc/ansible/son-ift-ptin.rsa")}"
+        private_key = "${file("son-ift-ptin.rsa")}"
     }
 }
 
