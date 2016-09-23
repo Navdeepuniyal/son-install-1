@@ -29,8 +29,8 @@ resource "openstack_compute_instance_v2" "sonata-sp" {
   user_data = "${file("bootstrap-son.sh")}"
 
 provisioner "file"{
-    source = "floatingip"
-    destination = "/home/ubuntu/floatingip"
+    source = "bootstrap-son.sh"
+    destination = "/tmp/bootstrap.sh"
     connection {
         user = "${var.ssh_user}"
         private_key = "${file("son-ift-ptin.rsa")}"
@@ -38,10 +38,28 @@ provisioner "file"{
 }
 
 provisioner "remote-exec" {
+    inline = ["sudo chmod +x /tmp/bootstrap.sh", "/tmp/bootstrap.sh"]
     inline = ["sudo sh -c 'echo ${openstack_compute_instance_v2.sonata-sp.access_ip_v4} ${openstack_compute_instance_v2.sonata-sp.name} >> /etc/hosts'"]
     connection {
       user = "ubuntu"
       private_key = "${file("/etc/ansible/son-ift-ptin.rsa")}"
     }
  }
+}
+resource "template_file" "web_ansible" {
+  count = "${var.node_count}"
+  template = "${file("${path.module}/hostname.tpl")}"
+  vars{
+    #extra = "${element(split(",",openstack_compute_instance_v2.sonata-sp.access_ip_v4))}"
+    name = "os-${var.vm_name}${format("%02d",count.index)}"
+    extra = "${openstack_compute_instance_v2.sonata-sp.access_ip_v4}"
+  }
+}
+
+resource "template_file" "ansible_hosts" {
+  template = "${file("${path.module}/ansible_hosts.tpl")}"
+  vars {
+    env       = "dev"
+    web_hosts = "${join("\n",template_file.web_ansible.*.rendered)}"
+  }
 }
