@@ -1,6 +1,6 @@
 ---
 - name: deploy Docker engine to the 'target' machine
-  hosts: "{{ target }}"
+  hosts: target
   sudo: yes
   roles:
   - docker

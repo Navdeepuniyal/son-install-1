@@ -1,6 +1,6 @@
 ---
 - name: set NTP on the target machine
-  hosts: "{{ target }}"
+  hosts: target
   sudo: yes
   roles:
   - ntp

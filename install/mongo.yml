@@ -1,6 +1,6 @@
 ---
 - name: create a MongoDB for the target machine
-  hosts: "{{ target }}"
+  hosts: target
   sudo: yes
   tasks:
   - name: deploy MongoDB container for Monitory

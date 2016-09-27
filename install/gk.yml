@@ -1,6 +1,6 @@
 ---
 - name: deployment of SP GATEKEEPER as a Docker containers from Registry
-  hosts: "{{ target }}"
+  hosts: target
   sudo: yes
   tasks:
 
@@ -10,10 +10,11 @@
     docker_container:
       name: son-gui
       image: sonatanfv/son-gui
+ #     debug: msg="The IP is{{ inventory_hostname }}"
       env:
-        MON_URL: "{{ public_ip }}:8000"
-        GK_URL: "{{ public_ip }}:32001"
-        LOGS_URL: "{{ public_ip }}:12900"
+        MON_URL: "{{ inventory_hostname }}:8000"
+        GK_URL: "{{ inventory_hostname }}:32001"
+        LOGS_URL: "{{ inventory_hostname }}:12900"
       state: started
       exposed_ports: 80
       ports: "80:80"
@@ -22,7 +23,7 @@
     docker:
       name: son-bss
       image: sonatanfv/son-yo-gen-bss
-      command: grunt serve:integration --gkApiUrl=http://{{ public_ip }}:32001
+      command: grunt serve:integration --gkApiUrl=http://{{ inventory_hostname }}:32001
       state: started
       ports: "25001:1337"
 
@@ -31,7 +32,7 @@
       name: son-gtkpkg
       image: sonatanfv/son-gtkpkg
       env:
-        CATALOGUES_URL: http://{{ public_ip }}:4002/catalogues
+        CATALOGUES_URL: http://{{ inventory_hostname }}:4002/catalogues
         RACK_ENV: integration
       state: started
       ports: "5100:5100"
@@ -41,10 +42,10 @@
       name: son-gtksrv
       image: sonatanfv/son-gtksrv
       env:
-        CATALOGUES_URL: http://{{ public_ip }}:4002/catalogues
+        CATALOGUES_URL: http://{{ inventory_hostname }}:4002/catalogues
         RACK_ENV: integration
-        MQSERVER: amqp://guest:guest@{{ public_ip }}:5672
-        DATABASE_HOST: "{{ public_ip }}"
+        MQSERVER: amqp://guest:guest@{{ inventory_hostname }}:5672
+        DATABASE_HOST: "{{ inventory_hostname }}"
         DATABASE_PORT: 5432
         POSTGRES_PASSWORD: sonata
         POSTGRES_USER: sonatatest
@@ -58,7 +59,7 @@
       name: son-gtkfnct
       image: sonatanfv/son-gtkfnct
       env:
-        CATALOGUES_URL: http://{{ public_ip }}:4002/catalogues
+        CATALOGUES_URL: http://{{ inventory_hostname }}:4002/catalogues
         RACK_ENV: integration
       state: started
       ports: "5500:5500"
@@ -68,7 +69,7 @@
       name: son-gtkrec
       image: sonatanfv/son-gtkrec
       env:
-        REPOSITORIES_URL: http://{{ public_ip }}:4002/records
+        REPOSITORIES_URL: http://{{ inventory_hostname }}:4002/records
         RACK_ENV: integration
       state: started
       ports: "5800:5800"
@@ -79,8 +80,8 @@
       image: sonatanfv/son-gtkvim
       env:
         RACK_ENV: integration
-        MQSERVER: amqp://guest:guest@{{ public_ip }}:5672
-        DATABASE_HOST: "{{ public_ip }}"
+        MQSERVER: amqp://guest:guest@{{ inventory_hostname }}:5672
+        DATABASE_HOST: "{{ inventory_hostname }}"
         DATABASE_PORT: 5432
         POSTGRES_PASSWORD: sonata
         POSTGRES_USER: sonatatest
@@ -95,11 +96,11 @@
       image: sonatanfv/son-gtkapi
       env:
         RACK_ENV: integration
-        PACKAGE_MANAGEMENT_URL: http://{{ public_ip }}:5100
-        SERVICE_MANAGEMENT_URL: http://{{ public_ip }}:5300
-        FUNCTION_MANAGEMENT_URL: http://{{ public_ip }}:5500
-        VIM_MANAGEMENT_URL: http://{{ public_ip }}:5700 
-        RECORD_MANAGEMENT_URL: http://{{ public_ip }}:5800
+        PACKAGE_MANAGEMENT_URL: http://{{ inventory_hostname }}:5100
+        SERVICE_MANAGEMENT_URL: http://{{ inventory_hostname }}:5300
+        FUNCTION_MANAGEMENT_URL: http://{{ inventory_hostname }}:5500
+        VIM_MANAGEMENT_URL: http://{{ inventory_hostname }}:5700 
+        RECORD_MANAGEMENT_URL: http://{{ inventory_hostname }}:5800
       links:
         - son-gtkpkg
         - son-gtkfnct
@@ -108,4 +109,3 @@
         - son-gtkvim
       state: started
       ports: "32001:5000"
-

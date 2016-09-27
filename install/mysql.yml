@@ -1,6 +1,6 @@
 ---
 - name: create a MySQL database for the SON-SP VM appliance
-  hosts: "{{ target }}"
+  hosts: target
   sudo: yes
   tasks:
   - name: deploy MySQL container for Monitory

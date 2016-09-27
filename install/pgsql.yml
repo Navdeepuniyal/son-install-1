@@ -1,6 +1,6 @@
 ---
 - name: deploy a PostgreSQL database server to the 'target' machine
-  hosts: "{{ target }}"
+  hosts: target
   sudo: yes
   tasks:
   - name: deploy postgres container

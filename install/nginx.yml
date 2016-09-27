@@ -1,6 +1,6 @@
 ---
 - name: deploy NGINX to the 'target' machine'
-  hosts: "{{ target }}"
+  hosts: target
   sudo: yes
   roles:
   - nginx

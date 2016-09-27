@@ -1,6 +1,6 @@
 ---
 - name: deploy useful tools and common libraries to the 'target' machine
-  hosts: "{{ target }}"
+  hosts: target
   sudo: yes
   roles:
     - common

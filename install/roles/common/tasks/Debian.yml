@@ -1,5 +1,8 @@
 ---
 
+#- name: copy ansible inventory
+#  copy: src=/tmp/ansible/hosts dest=/etc/ansible/hosts owner=root group=root mode=0644
+
 - name: previous install APTitude
   apt: name=aptitude state=latest
 
