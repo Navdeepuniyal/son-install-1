@@ -1,2 +1,2 @@
-[${env}]
+[target]
 ${web_hosts}

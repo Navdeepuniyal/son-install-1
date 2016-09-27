@@ -1,1 +1,1 @@
-${name} ${extra}
+${ipaddr} ${extra}
