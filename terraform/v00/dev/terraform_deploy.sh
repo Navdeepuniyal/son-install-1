@@ -1,4 +1,7 @@
 #!/bin/bash
+wget -O /etc/terraform/terraform.zip https://releases.hashicorp.com/terraform/0.7.4/terraform_0.7.4_linux_amd64.zip
+unzip /etc/terraform.zip -d /etc/terraform
+export PATH=$PATH:/etc/terraform
 cp son-ift-ptin.rsa /etc/ansible
 ssh-add /etc/ansible/son-ift-ptin.rsa
 terraform plan
