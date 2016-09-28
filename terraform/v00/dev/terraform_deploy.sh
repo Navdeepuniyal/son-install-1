@@ -1,14 +1,47 @@
 #!/bin/bash
-wget -O /etc/terraform/terraform.zip https://releases.hashicorp.com/terraform/0.7.4/terraform_0.7.4_linux_amd64.zip
-unzip /etc/terraform.zip -d /etc/terraform
+
+cwd=$(pwd)
+
+#Install Git
+sudo apt-get install git -y
+
+#Install Terraform
+wget -O ~/terraform.zip https://releases.hashicorp.com/terraform/0.7.4/terraform_0.7.4_linux_amd64.zip
+sudo apt-get install unzip
+sudo unzip ~/terraform.zip -d /etc/terraform
 export PATH=$PATH:/etc/terraform
-cp son-ift-ptin.rsa /etc/ansible
-ssh-add /etc/ansible/son-ift-ptin.rsa
+
+#Install and setup ansible
+mkdir ~/ansible
+git clone git://github.com/ansible/ansible.git --recursive ~/ansible
+cd ~/ansible
+source ./hacking/env-setup
+sudo apt-get install python-pip python-dev build-essential -y
+sudo pip install --upgrade pip
+sudo pip install --upgrade virtualenv
+sudo pip install paramiko
+sudo pip install PyYAML
+sudo pip install Jinja2
+sudo pip install httplib2
+sudo pip install six
+sudo pip install markupsafe
+
+#Change  permissions of the private key
+mkdir ~/ansible_inventory
+cd $cwd
+chmod 600 son-ift-ptin.rsa
+cp son-ift-ptin.rsa ~/ansible_inventory/
+
+#Deploy VM
 terraform plan
 terraform apply
-#mkdir /tmp/ansible
-#touch /tmp/ansible/hosts
-terraform output ansible_inventory > /etc/ansible/hosts
+
+#Generate Ansible Inventory
+terraform output ansible_inventory > ~/ansible_inventory/hosts
 cd ../../..
 sleep 5s
-ansible-playbook son-cmud.yml -e "operation=install service=all"
+
+#Deploy Sonata SP
+eval "$(ssh-agent)"
+ssh-add ~/ansible_inventory/son-ift-ptin.rsa
+ansible-playbook son-cmud.yml -e "operation=install service=all" -i ~/ansible_inventory/hosts
