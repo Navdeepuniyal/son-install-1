@@ -2,9 +2,6 @@
 
 cwd=$(pwd)
 
-#Install Git
-sudo apt-get install git -y
-
 #Install Terraform
 wget -O ~/terraform.zip https://releases.hashicorp.com/terraform/0.7.4/terraform_0.7.4_linux_amd64.zip
 sudo apt-get install unzip
