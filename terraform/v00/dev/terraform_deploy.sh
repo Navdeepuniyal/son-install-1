@@ -23,6 +23,8 @@ sudo pip install httplib2
 sudo pip install six
 sudo pip install markupsafe
 
+export ANSIBLE_HOST_KEY_CHECKING=False
+
 #Change  permissions of the private key
 mkdir ~/ansible_inventory
 cd $cwd
