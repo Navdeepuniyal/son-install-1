@@ -5,11 +5,17 @@
   tasks:
 
   - name: check if the DOCKER service exists
+    command: systemctl is-active docker.service
+    register: service_status_centos
+    when: ansible_distribution == 'CentOS'
+
+  - name: check if the DOCKER service exists
     stat: path=/etc/init.d/docker
-    register: service_status
+    register: service_status_debian
+    when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
 
   - name: run the "SP Message Bus"
-    docker_container: 
+    docker_container:
       name: son-broker
       image: rabbitmq
       env:
@@ -19,5 +25,4 @@
       privileged: yes
       volumes:
         - /var/log/sonata/son-broker:/var/log/son-broker
-    when: service_status.stat.exists
-
+    when: service_status_centos.stdout == "active" or service_status_debian.stat.exists
